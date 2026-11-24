@@ -54,26 +54,29 @@ pio run
 
 Berhasil jika muncul `[SUCCESS]`.
 
-### 4. Upload ke board
+### 4. Upload ke board (manual — board ini tidak bisa auto-upload)
+
+> ⚠️ **Penting:** modul 3.5" ini **tidak bisa masuk mode download otomatis**. Upload harus lewat urutan tombol di bawah, kalau tidak akan muncul `Wrong boot mode detected` / `Failed to connect`.
 
 1. Colok board ke PC lewat USB.
-2. Klik ikon **→ (Upload)** di status bar, atau:
-
-```bash
-pio run -t upload
-```
-
-PlatformIO mendeteksi port otomatis. Jika PC punya beberapa port COM dan yang terpilih salah, tentukan sendiri:
+2. **Tekan dan tahan** tombol **BOOT**.
+3. Sambil menahan **BOOT**, **tekan lalu lepas** tombol **RST**.
+4. **Lepas** tombol **BOOT**. Board sekarang berada di mode download (layar tetap gelap).
+5. Jalankan upload (sesuaikan nomor COM dengan board Anda):
 
 ```bash
 pio run -t upload --upload-port COM33
 ```
 
+6. Setelah muncul `[SUCCESS]`, **tekan tombol RST sekali** untuk menjalankan program.
+
 (Lihat nomor port di **Device Manager → Ports (COM & LPT) → USB-SERIAL CH340 (COMxx)**.)
+
+> Kalau upload gagal (`Wrong boot mode detected`, `Failed to connect`, atau `Timed out waiting for packet header`), ulangi langkah 2–4 lalu upload lagi. Pastikan tidak ada aplikasi lain yang memakai port COM tersebut.
 
 ### 5. Selesai 🎉
 
-Setelah upload, board restart dan menampilkan halaman **Profile Elena Smith**. Coba sentuh tab **Profile / Analytics / Shop**, slider, switch, dan textbox (keyboard muncul di layar).
+Setelah menekan **RST**, board restart dan menampilkan halaman **Profile Elena Smith** dalam mode **landscape**. Coba sentuh tab **Profile / Analytics / Shop**, slider, switch, dan textbox (keyboard muncul di layar).
 
 Serial monitor (opsional): `pio device monitor`
 
@@ -83,7 +86,8 @@ Serial monitor (opsional): `pio device monitor`
 |---|---|
 | `Could not open COMxx ... Access is denied` | Port sedang dipakai aplikasi lain (Arduino IDE, serial monitor, dll). Tutup aplikasi itu, lalu upload lagi. |
 | Port COM tidak muncul | Install driver CH340, ganti kabel USB (harus kabel data). |
-| `Failed to connect to ESP32` | Tahan tombol **BOOT**, tekan & lepas **RST**, lalu lepas **BOOT**; upload ulang. |
+| `Failed to connect to ESP32` / `Wrong boot mode detected` | Board belum di mode download. Ulangi: **tahan BOOT → klik RST → lepas BOOT**, lalu upload lagi. |
+| `Timed out waiting for packet header` | Sama seperti di atas — ulangi urutan BOOT + RST, pastikan kabel USB data dan tidak ada aplikasi lain memakai port COM. |
 | Compile error `No such file or directory` pada file yang sebenarnya ada | Path folder project terlalu panjang — pindahkan ke folder yang lebih pendek. |
 | `Sketch too big` / flash penuh | Project ini memakai partisi app default (±1.2 MB). Firmware demo ±840 KB, masih muat. Kalau menambah banyak kode, ganti partisi di `boards/esp32-3248S035C.json`. |
 | Layar hitam tapi upload sukses | Cek serial monitor; tekan RST. Pastikan board benar varian **3248S035C**. |
