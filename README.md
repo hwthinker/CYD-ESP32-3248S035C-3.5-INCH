@@ -1,6 +1,6 @@
 # ESP32 3.5" CYD (ESP32-3248S035C) — LVGL 9 Widgets Demo
 
-Demo **LVGL 9 Widgets** (halaman *Profile* "Elena Smith" yang legendaris, plus tab *Analytics* dan *Shop*) untuk board **Sunton ESP32-3248S035C** — LCD 3.5 inch 320×480 dengan **touch kapasitif GT911**.
+Demo **LVGL 9 Widgets** (halaman *Profile* "Elena Smith" yang legendaris, plus tab *Analytics* dan *Shop*) untuk board **Sunton ESP32-3248S035C** — LCD 3.5 inch **landscape 480×320** dengan **touch kapasitif GT911**.
 
 Project ini siap pakai dengan **PlatformIO**: clone → build → upload, tanpa setting tambahan.
 
@@ -10,7 +10,7 @@ Project ini siap pakai dengan **PlatformIO**: clone → build → upload, tanpa 
 |---|---|
 | Board | Sunton **ESP32-3248S035C** (huruf **C** = capacitive touch) |
 | MCU | ESP32 klasik (dual-core 240 MHz), 4 MB flash, 520 KB SRAM, **tanpa PSRAM** |
-| Layar | 3.5" 320×480, SPI (ST7796) |
+| Layar | 3.5" **480×320 landscape**, SPI (ST7796) — panel native portrait 320×480, diputar oleh LVGL |
 | Touch | GT911 kapasitif (I²C: SDA 33, SCL 32, RST 25, INT 21) |
 | Backlight | GPIO 27 |
 | Lainnya | slot microSD, RGB LED (4/16/17), sensor cahaya (GPIO 34), speaker (GPIO 26) |
@@ -18,7 +18,7 @@ Project ini siap pakai dengan **PlatformIO**: clone → build → upload, tanpa 
 
 > Varian **N** (tanpa touch) dan **R** (touch resistif) **tidak** cocok dengan project ini tanpa mengganti file board.
 
-> Catatan orientasi: panel 3.5" ini native **portrait 320×480**, jadi UI demo tampil tegak (sama seperti konfigurasi resmi Sunton/esp32-smartdisplay).
+> Catatan orientasi: panel 3.5" ini native **portrait 320×480**. Project ini memutarnya menjadi **landscape 480×320** lewat `lv_display_set_rotation(..., LV_DISPLAY_ROTATION_90)` di `src/main.cpp`; koordinat touch ikut diputar otomatis oleh LVGL.
 
 ## Yang dibutuhkan
 
@@ -124,6 +124,7 @@ Jika demo tidak dipakai lagi, hapus folder `src/lvgl_demo/` dan set `LV_BUILD_DE
 - **Patch 1** — `lib/esp32_smartdisplay/include/lvgl_panel_common.h`: `esp_lcd_panel_disp_on_off()` mengembalikan `ESP_ERR_NOT_SUPPORTED` pada panel tanpa pin DISP sehingga board bisa boot-loop. Error tersebut sekarang diabaikan.
 - **Patch 2 (opsional)** — `lib/esp32_smartdisplay/src/esp_touch_gt911.c`: fallback area sentuh native GT911 bila register resolusinya terbaca 0 (dipakai di project 4.3" 8048S043C_I). Di board 3.5" ini fallback **tidak aktif** karena `GT911_TOUCH_NATIVE_WIDTH` tidak didefinisikan di `board_3248S035C.h`.
 - **Tanpa PSRAM**: draw buffer LVGL dialokasikan di RAM internal (`LVGL_BUFFER_PIXELS = W*H/16` ± 19 KB), dan `LV_MEM_SIZE` = 96 KB. RAM statis terpakai ±122 KB dari 320 KB.
+- **Rotasi landscape**: `lv_display_set_rotation(..., LV_DISPLAY_ROTATION_90)` di `setup()` memutar panel (MADCTL swap/mirror) dan resolusi LVGL menjadi 480×320. Jika di board lain gambar justru terbalik, ganti ke `LV_DISPLAY_ROTATION_270`.
 - **Define hardware** dipindah dari board JSON ke `include/board_3248S035C.h` (force-include via `build_flags`) agar command line compiler tidak melebihi batas 32K karakter Windows.
 - Source demo LVGL ada di folder `demos/` yang tidak di-compile otomatis oleh PlatformIO, karena itu ada wrapper di `src/lvgl_demo/`.
 

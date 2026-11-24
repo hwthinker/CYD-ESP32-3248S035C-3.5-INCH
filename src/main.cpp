@@ -1,4 +1,4 @@
-// ESP32-3248S035C (3.5" 320x480, GT911 touch) - LVGL 9 Widgets demo (profil "Elena Smith")
+// ESP32-3248S035C (3.5" landscape 480x320, GT911 touch) - LVGL 9 Widgets demo (profil "Elena Smith")
 #include <Arduino.h>
 #include <esp32_smartdisplay.h>
 #include <demos/lv_demos.h>
@@ -11,6 +11,10 @@ void setup()
 
     smartdisplay_init();
     smartdisplay_lcd_set_backlight(1.0f); // kecerahan penuh
+
+    // Panel 3.5" ini native portrait (320x480). Putar ke landscape 480x320.
+    // LVGL juga otomatis memutar koordinat touch mengikuti rotasi display.
+    lv_display_set_rotation(lv_display_get_default(), LV_DISPLAY_ROTATION_90);
 
     lv_demo_widgets();
 }
